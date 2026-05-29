@@ -25,7 +25,7 @@ from app.tools.structured_tools import (
 from app.tools.summarization_tools import summarize_category
 from app.tools.utility_tools import calculate_expression
 
-DEFAULT_API_BASE = "https://nebius.com"
+DEFAULT_API_BASE = "https://api.tokenfactory.nebius.com/v1/"
 DEFAULT_MODEL = "meta-llama/Llama-3.3-70B-Instruct"
 
 
