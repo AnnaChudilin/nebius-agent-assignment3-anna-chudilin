@@ -1,0 +1,23 @@
+# Graph execution environment
+langchain==0.3.25
+langchain-core==0.3.61
+langchain-community==0.3.24
+# Keeps langchain-openai on the stable 0.2.x branch to bypass chat_template bugs
+langchain-openai==0.2.14
+langgraph==0.4.7
+langgraph-checkpoint>=2.0.26,<3.0.0
+
+openai==1.58.1
+
+# Data processing (used in tools and distribution logic)
+pandas==2.2.3
+
+pydantic==2.11.4
+fastmcp==2.2.0
+python-dotenv==1.1.0
+sqlalchemy==2.0.40
+aiosqlite==0.21.0
+rich==14.0.0
+
+# Web UI Interface
+streamlit>=1.35.0
