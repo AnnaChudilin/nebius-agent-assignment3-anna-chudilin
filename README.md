@@ -64,7 +64,7 @@ python3.13 -m app.mcp.server
   - `intent_distribution` — Get statistics on overall intent distribution.
   - `summarize_category` — Summarize data for a category.
   - `calculate_expression` — Evaluate basic arithmetic expressions.
-- **Thread-Safe SQLite Checkpointing**: Persistent state management is handled by a custom `SqliteCheckpointSaver` back-end pointing to `checkpoints/checkpoints.db`. It implements isolated transactional workflows (`PRAGMA journal_mode=WAL`) protected by concurrent Python `threading.Lock` primitives to prevent race conditions during parallel graph processing.
+- **Thread-Safe SQLite Checkpointing**: Persistent state management is handled by a custom `SqliteCheckpointSaver` back-end pointing to `checkpoints/checkpoints.db`. It implements isolated transactional workflows (`PRAGMA journal_mode=WAL`) protected with thread locks to prevent concurrent write conflicts to prevent race conditions during parallel graph processing.
 
 ### 1. High-Level System Architecture
 
