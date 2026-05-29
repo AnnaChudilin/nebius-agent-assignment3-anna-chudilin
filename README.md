@@ -52,7 +52,7 @@ python3.13 -m app.mcp.server
 
 ## 5. Architecture Overview
 
-- **Model selection**: The agent uses `langchain_openai.ChatOpenAI` backed by the `Meta-Llama-3.1-8B-Instruct` model hosted on the Nebius Token Factory endpoint. This open-weight model provides excellent instruction-following capabilities for structured text parsing and reasoning tasks.
+- **Model selection**: The agent uses `langchain_openai.ChatOpenAI` backed by the `Meta-Llama-3.3-70B-Instruct` model hosted on the Nebius Token Factory endpoint. This open-weight model provides excellent instruction-following capabilities for structured text parsing and reasoning tasks.
 - **Custom ReAct Loop**: Due to target API constraints regarding native schema serialization (`chat_template` payload errors), the architecture leverages a custom text-based ReAct loop orchestrated via a LangGraph `StateGraph`. The model generates explicit markdown JSON blocks (`{ "action": "tool_name", ... }`) which are captured, parsed, and routed to Python execution blocks via conditional edges in the state machine.
 - **Query Routing**: An explicit `classify_query` preprocessing step functions as a hard constraint router node. It classifies incoming queries into `structured`, `unstructured`, or `out_of_scope` categories, ensuring the LLM gracefully declines out-of-scope prompts without hallucinating from its generic background weights.
 - **Tools**: The project defines explicit, strictly typed tools equipped with comprehensive functional docstrings and validation rules:
