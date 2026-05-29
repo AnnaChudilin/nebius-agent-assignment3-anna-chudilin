@@ -47,7 +47,7 @@ python3.13 main.py --session anna
 ## 4. Run MCP Server
 
 ```bash
-python3.13 -m app.msp.server
+python3.13 -m app.mcp.server
 ```
 
 ## 5. Architecture Overview
@@ -103,12 +103,12 @@ The FastMCP server runs on a secure standard input/output (Stdio) transport laye
 npm install -g @modelcontextprotocol/inspector
 
 # Run the inspector pointed directly at your local Python server script
-npx @modelcontextprotocol/inspector python3.13 -m app.msp.server
+npx @modelcontextprotocol/inspector python3.13 -m app.mcp.server
 ```
 
 Alternatively, you can test it programmatically inside an active Python environment using the `mcp-cli` wrapper:
 
 ```bash
 pip install mcp-cli
-mcp-cli run python3.13 -m app.msp.server
+mcp-cli run python3.13 -m app.mcp.server
 ```
