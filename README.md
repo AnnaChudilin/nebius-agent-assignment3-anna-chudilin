@@ -112,6 +112,38 @@ graph TD
     class LLM,MCPServer external;
 ```
 
+```mermaid
+graph TD
+    %% Node Styling Definitions
+    classDef ui fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px;
+    classDef routing fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px;
+    classDef core fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+    classDef tools fill:#e8f5e9,stroke:#4caf50,stroke-width:2px;
+    classDef memory fill:#fafafa,stroke:#616161,stroke-width:2px;
+
+    %% Sequential Architecture Pipeline
+    UserInput([User Input]) ==>|1. Raw Query / Session Token| StreamlitUI["Streamlit UI (app_streamlit.py)"]
+    
+    StreamlitUI ==>|2. Intent Classification Guard| RouterNode["LLM Router / Classifier (Structured vs General)"]
+    
+    RouterNode ==>|3. Execution State Payload| ReActGraph["Core ReAct Graph (LangGraph Execution Loop)"]
+    
+    ReActGraph <=>|4. Dynamic Tool Binds| DatasetTools["Dataset Tools Hub (count_by_intent / list_examples / summary)"]
+    
+    DatasetTools <=>|5. Local CSV Context| CSVRegistry[("Dataset Source (bitext.csv)")]
+    
+    ReActGraph ==>|6. Transactional Save / BEGIN IMMEDIATE| SqliteMemory[("Episodic Memory (checkpoints.db via SqliteCheckpointSaver)")]
+    
+    DatasetTools <=>|7. Pagination State / Profile Token| UserProfile[("User Profile & Metrics (app.profile)") ]
+
+    %% Assigning styles to nodes
+    class UserInput,StreamlitUI ui;
+    class RouterNode routing;
+    class ReActGraph core;
+    class DatasetTools,CSVRegistry tools;
+    class SqliteMemory,UserProfile memory;
+```
+
 ## 6. Automated Tests
 
 Run the automated test suite from the workspace root after activating the virtual environment:
