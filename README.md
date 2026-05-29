@@ -122,19 +122,19 @@ graph TD
     classDef memory fill:#fafafa,stroke:#616161,stroke-width:2px;
 
     %% Sequential Architecture Pipeline
-    UserInput([User Input]) ==>|1. Raw Query / Session Token| StreamlitUI["Streamlit UI (app_streamlit.py)"]
+    UserInput([User Input]) ===|1. Raw Query and Session Token| StreamlitUI["Streamlit UI (app_streamlit.py)"]
     
-    StreamlitUI ==>|2. Intent Classification Guard| RouterNode["LLM Router / Classifier (Structured vs General)"]
+    StreamlitUI ===|2. Intent Classification Guard| RouterNode["LLM Router and Classifier (Structured vs General)"]
     
-    RouterNode ==>|3. Execution State Payload| ReActGraph["Core ReAct Graph (LangGraph Execution Loop)"]
+    RouterNode ===|3. Execution State Payload| ReActGraph["Core ReAct Graph (LangGraph Execution Loop)"]
     
-    ReActGraph <=>|4. Dynamic Tool Binds| DatasetTools["Dataset Tools Hub (count_by_intent / list_examples / summary)"]
+    ReActGraph ===|4. Dynamic Tool Binding loop| DatasetTools["Dataset Tools Hub (count_by_intent, list_examples, summary)"]
     
-    DatasetTools <=>|5. Local CSV Context| CSVRegistry[("Dataset Source (bitext.csv)")]
+    DatasetTools ===|5. Local CSV Data Context| CSVRegistry[("Dataset Source (bitext.csv)")]
     
-    ReActGraph ==>|6. Transactional Save / BEGIN IMMEDIATE| SqliteMemory[("Episodic Memory (checkpoints.db via SqliteCheckpointSaver)")]
+    ReActGraph ===|6. Transactional Save with BEGIN IMMEDIATE| SqliteMemory[("Episodic Memory (checkpoints.db via SqliteCheckpointSaver)")]
     
-    DatasetTools <=>|7. Pagination State / Profile Token| UserProfile[("User Profile & Metrics (app.profile)") ]
+    DatasetTools ===|7. Pagination State and Profile Token| UserProfile[("User Profile and Metrics (app.profile)")]
 
     %% Assigning styles to nodes
     class UserInput,StreamlitUI ui;
