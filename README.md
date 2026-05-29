@@ -76,37 +76,37 @@ graph TD
 
     %% User Interface Layer
     subgraph UI_Layer [User Interface Layer]
-        User([User]) -->|1. Types Input / Sets Session ID| Streamlit[Streamlit Web App <br> app_streamlit.py]
+        User([User]) -->|1. Types Input / Sets Session ID| Streamlit["Streamlit Web App (app_streamlit.py)"]
     end
     class Streamlit ui;
 
     %% Core Orchestration Layer
     subgraph Core_Layer [Core Orchestration Layer]
-        Streamlit -->|2. Streams State Updates| LangGraph[LangGraph StateGraph Workflow <br> compile_react_workflow]
+        Streamlit -->|2. Streams State Updates| LangGraph["LangGraph StateGraph Workflow (compile_react_workflow)"]
         
         %% Bonus B Components
-        Streamlit .->|Bonus B: Scans Episodic Memory| RecEngine[Query Recommender Engine <br> Dynamic Prompting]
+        Streamlit .->|Bonus B: Scans Episodic Memory| RecEngine["Query Recommender Engine (Dynamic Prompting)"]
     end
     class LangGraph,RecEngine core;
 
     %% Storage & Context Layer
     subgraph Storage_Layer [Storage & Context Layer]
-        LangGraph -->|3. Persists Thread State via ACID| SQLite[(SQLite Database <br> checkpoints.db)]
-        LangGraph -.->|4. Reads Dataset Context| CSV[(Dataset Registry <br> bitext.csv)]
+        LangGraph -->|3. Persists Thread State via ACID| SQLite[("SQLite Database (checkpoints.db)")]
+        LangGraph -.->|4. Reads Dataset Context| CSV[("Dataset Registry (bitext.csv)")]
         
         %% SqliteCheckpointSaver Connectivity
-        SQLiteCheckpoint[SqliteCheckpointSaver <br> isolation_level=None] --- SQLite
+        SQLiteCheckpoint["SqliteCheckpointSaver (isolation_level=None)"] --- SQLite
     end
     class SQLite,CSV,SQLiteCheckpoint storage;
 
     %% External Integration Layer
     subgraph External_Layer [External Integration Layer]
         %% LLM Orchestration
-        LangGraph <=>|5. Tool Calling / JSON-RPC| LLM[Nebius API <br> Llama-3.3-70B-Instruct]
-        RecEngine <=>|Independent Recommendation Call| LLM
+        LangGraph ===|5. Tool Calling and JSON-RPC| LLM["Nebius API (Llama-3.3-70B-Instruct)"]
+        RecEngine ===|Independent Recommendation Call| LLM
         
         %% MCP Communication
-        LangGraph <=>|6. Extensible API Protocols| MCPServer[MCP Server <br> Model Context Protocol]
+        LangGraph ===|6. Extensible API Protocols| MCPServer["MCP Server (Model Context Protocol)"]
         MCPServer -->|Queries Metadata| CSV
     end
     class LLM,MCPServer external;
