@@ -152,7 +152,7 @@ if raw_user_query := st.chat_input("Ask a question or type 'What should I query 
             )
 
             try:
-                # FIX: Initialize an independent ChatOpenAI model using environment configurations
+                # Initialize an independent ChatOpenAI model using environment configurations
                 # to completely bypass the CompiledStateGraph attribute limitation.
                 from langchain_openai import ChatOpenAI
                 import os

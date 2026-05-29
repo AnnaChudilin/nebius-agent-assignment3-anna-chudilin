@@ -10,22 +10,22 @@ from pydantic import BaseModel
 from typing import Literal
 
 STRUCTURED_KEYWORDS = [
-    "more",         # FIX: Forces 'Show me 3 more' to lock cleanly into the structured graph node workflow
+    "more",         # Forces 'Show me 3 more' to lock cleanly into the structured graph node workflow
     "count",
     "how many",
     "distribution",
     "show",
     "examples",
     "category",
-    "categories",  # FIX: Added plural form to capture 'what categories exist' accurately
+    "categories",  # Added plural form to capture 'what categories exist' accurately
     "intent",
-    "intents",     # FIX: Added plural form for intent queries
+    "intents",     # Added plural form for intent queries
     "top",
     "percentage",
     "total",
     "number",
     "refund",
-    "refunds",    # FIX: Added plural form
+    "refunds",    # Added plural form
     "shipping",
     "billing",
     "cancellation",
@@ -106,7 +106,7 @@ def classify_query(query: str) -> RouteResult:
             reason="Detected a question that is unrelated to the customer service dataset.",
         )
 
-    # FIX: 2. Elevate explicit UNSTRUCTURED command heuristics (summarize, explain) above structured entity keywords.
+    # Elevate explicit UNSTRUCTURED command heuristics (summarize, explain) above structured entity keywords.
     # This ensures "Summarize the FEEDBACK category" is classified as unstructured, exactly as Task 1 requires.
     if any(keyword in normalized for keyword in UNSTRUCTURED_KEYWORDS):
         return RouteResult(

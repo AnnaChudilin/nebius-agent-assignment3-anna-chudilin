@@ -66,6 +66,52 @@ python3.13 -m app.mcp.server
   - `calculate_expression` — Evaluate basic arithmetic expressions.
 - **Thread-Safe SQLite Checkpointing**: Persistent state management is handled by a custom `SqliteCheckpointSaver` back-end pointing to `checkpoints/checkpoints.db`. It implements isolated transactional workflows (`PRAGMA journal_mode=WAL`) protected by concurrent Python `threading.Lock` primitives to prevent race conditions during parallel graph processing.
 
+```mermaid
+graph TD
+    %% Node Styling Definitions
+    classDef ui fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px;
+    classDef core fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+    classDef storage fill:#e8f5e9,stroke:#4caf50,stroke-width:2px;
+    classDef external fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px;
+
+    %% User Interface Layer
+    subgraph UI_Layer [User Interface Layer]
+        User([User]) -->|1. Types Input / Sets Session ID| Streamlit[Streamlit Web App <br> app_streamlit.py]
+    end
+    class Streamlit ui;
+
+    %% Core Orchestration Layer
+    subgraph Core_Layer [Core Orchestration Layer]
+        Streamlit -->|2. Streams State Updates| LangGraph[LangGraph StateGraph Workflow <br> compile_react_workflow]
+        
+        %% Bonus B Components
+        Streamlit .->|Bonus B: Scans Episodic Memory| RecEngine[Query Recommender Engine <br> Dynamic Prompting]
+    end
+    class LangGraph,RecEngine core;
+
+    %% Storage & Context Layer
+    subgraph Storage_Layer [Storage & Context Layer]
+        LangGraph -->|3. Persists Thread State via ACID| SQLite[(SQLite Database <br> checkpoints.db)]
+        LangGraph -.->|4. Reads Dataset Context| CSV[(Dataset Registry <br> bitext.csv)]
+        
+        %% SqliteCheckpointSaver Connectivity
+        SQLiteCheckpoint[SqliteCheckpointSaver <br> isolation_level=None] --- SQLite
+    end
+    class SQLite,CSV,SQLiteCheckpoint storage;
+
+    %% External Integration Layer
+    subgraph External_Layer [External Integration Layer]
+        %% LLM Orchestration
+        LangGraph <=>|5. Tool Calling / JSON-RPC| LLM[Nebius API <br> Llama-3.3-70B-Instruct]
+        RecEngine <=>|Independent Recommendation Call| LLM
+        
+        %% MCP Communication
+        LangGraph <=>|6. Extensible API Protocols| MCPServer[MCP Server <br> Model Context Protocol]
+        MCPServer -->|Queries Metadata| CSV
+    end
+    class LLM,MCPServer external;
+```
+
 ## 6. Automated Tests
 
 Run the automated test suite from the workspace root after activating the virtual environment:

@@ -49,7 +49,7 @@ for tool in [
     # Extract the clean callable function object
     tool_fn = _unwrap_tool(tool)
 
-    # FIX: Use the explicit add_tool method for dynamic registration instead of calling decorators
+    # Use the explicit add_tool method for dynamic registration instead of calling decorators
     mcp.add_tool(tool_fn)
 
 
