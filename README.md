@@ -198,7 +198,7 @@ pip install mcp-cli
 mcp-cli run python3.13 -m app.mcp.server
 ```
 
-## 9. 🧩 Model Context Protocol (MCP) Integration Example
+## 9. Model Context Protocol (MCP) Integration Example
 
 The agent seamlessly integrates with an **MCP Server** using standard `stdio` / JSON-RPC communication channels. This abstracts the data retrieval layer (`bitext.csv`) away from the direct LLM context.
 
@@ -250,7 +250,7 @@ Thanks to the universal streaming parser in `app_streamlit.py`, this entire life
 * **📥 Tool Output (Expander)**: Expands to display the raw structural database output snippet in formatted JSON code blocks.
 * **### Final Answer**: The final structured text breakdown formulated by Llama-3.3 based on the retrieved MCP server response.
 
-## 10. 🧠 ReAct Execution Trace (Reasoning & Acting)
+## 10. ReAct Execution Trace (Reasoning & Acting)
 
 The core orchestration layer uses a standard **ReAct pattern** (Thought $\rightarrow$ Action $\rightarrow$ Observation $\rightarrow$ Thought). Below is an execution trace captured directly from the streaming engine (`graph.stream`) when processing a typical multi-step analytical request.
 
