@@ -54,7 +54,7 @@ python3.13 -m app.mcp.server
 
 - **Model selection**: The agent uses `langchain_openai.ChatOpenAI` backed by the `Meta-Llama-3.3-70B-Instruct` model hosted on the Nebius Token Factory endpoint. This open-weight model provides excellent instruction-following capabilities for structured text parsing and reasoning tasks.
 - **Custom ReAct Loop**: Due to target API constraints regarding native schema serialization (`chat_template` payload errors), the architecture leverages a custom text-based ReAct loop orchestrated via a LangGraph `StateGraph`. The model generates explicit markdown JSON blocks (`{ "action": "tool_name", ... }`) which are captured, parsed, and routed to Python execution blocks via conditional edges in the state machine.
-- **Query Routing**: An explicit `classify_query` preprocessing step functions as a hard constraint router node. It classifies incoming queries into `structured`, `unstructured`, or `out_of_scope` categories, ensuring the LLM gracefully declines out-of-scope prompts without hallucinating from its generic background weights.
+- **Query Routing**: An explicit `classify_query` preprocessing step functions as a hard constraint router node. It classifies incoming queries into `structured`, `unstructured`, or `out_of_scope` categories, ensuring the LLM gracefully declines out-of-scope prompts without answering from general model knowledge.
 - **Tools**: The project defines explicit, strictly typed tools equipped with comprehensive functional docstrings and validation rules:
   - `list_categories` — Fetch all text categories.
   - `list_intents` — List available customer intents.
@@ -66,6 +66,10 @@ python3.13 -m app.mcp.server
   - `calculate_expression` — Evaluate basic arithmetic expressions.
 - **Thread-Safe SQLite Checkpointing**: Persistent state management is handled by a custom `SqliteCheckpointSaver` back-end pointing to `checkpoints/checkpoints.db`. It implements isolated transactional workflows (`PRAGMA journal_mode=WAL`) protected by concurrent Python `threading.Lock` primitives to prevent race conditions during parallel graph processing.
 
+### 1. High-Level System Architecture
+
+This diagram illustrates the full system architecture, including the Streamlit UI, LangGraph orchestration layer, persistent SQLite checkpointing, dataset integration, Nebius LLM communication, and MCP server connectivity.
+
 ```mermaid
 graph TD
     %% Node Styling Definitions
@@ -75,23 +79,23 @@ graph TD
     classDef external fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px;
 
     %% User Interface Layer
-    subgraph UI_Layer [User Interface Layer]
+    subgraph UI [User Interface Layer]
         User([User]) -->|1. Types Input / Sets Session ID| Streamlit["Streamlit Web App (app_streamlit.py)"]
     end
     class Streamlit ui;
 
     %% Core Orchestration Layer
-    subgraph Core_Layer [Core Orchestration Layer]
+    subgraph Core Workflow [Core Orchestration Layer]
         Streamlit -->|2. Streams State Updates| LangGraph["LangGraph StateGraph Workflow (compile_react_workflow)"]
         
         %% Bonus B Components
-        Streamlit .->|Bonus B: Scans Episodic Memory| RecEngine["Query Recommender Engine (Dynamic Prompting)"]
+        Streamlit .->|Bonus B: Scans Episodic Memory| RecEngine["Query Recommender"]
     end
     class LangGraph,RecEngine core;
 
     %% Storage & Context Layer
-    subgraph Storage_Layer [Storage & Context Layer]
-        LangGraph -->|3. Persists Thread State via ACID| SQLite[("SQLite Database (checkpoints.db)")]
+    subgraph Persistence [Storage & Context Layer]
+        LangGraph -->|3. Persists conversation state| SQLite[("SQLite Database (checkpoints.db)")]
         LangGraph -.->|4. Reads Dataset Context| CSV[("Dataset Registry (bitext.csv)")]
         
         %% SqliteCheckpointSaver Connectivity
@@ -100,7 +104,7 @@ graph TD
     class SQLite,CSV,SQLiteCheckpoint storage;
 
     %% External Integration Layer
-    subgraph External_Layer [External Integration Layer]
+    subgraph External Services [External Integration Layer]
         %% LLM Orchestration
         LangGraph ===|5. Tool Calling and JSON-RPC| LLM["Nebius API (Llama-3.3-70B-Instruct)"]
         RecEngine ===|Independent Recommendation Call| LLM
@@ -111,6 +115,9 @@ graph TD
     end
     class LLM,MCPServer external;
 ```
+### 2. ReAct Execution and Data Flow Pipeline
+
+This diagram shows the sequential runtime execution flow for a user request, from query ingestion and routing through ReAct reasoning, tool execution, dataset access, and persistent memory updates.
 
 ```mermaid
 graph TD
@@ -121,14 +128,14 @@ graph TD
     classDef tools fill:#e8f5e9,stroke:#4caf50,stroke-width:2px;
     classDef memory fill:#fafafa,stroke:#616161,stroke-width:2px;
 
-    %% Sequential Architecture Pipeline
+    %% ReAct Execution Pipeline
     UserInput([User Input]) ===|1. Raw Query and Session Token| StreamlitUI["Streamlit UI (app_streamlit.py)"]
     
     StreamlitUI ===|2. Intent Classification Guard| RouterNode["LLM Router and Classifier (Structured vs General)"]
     
     RouterNode ===|3. Execution State Payload| ReActGraph["Core ReAct Graph (LangGraph Execution Loop)"]
     
-    ReActGraph ===|4. Dynamic Tool Binding loop| DatasetTools["Dataset Tools Hub (count_by_intent, list_examples, summary)"]
+    ReActGraph ===|4. Dynamic Tool Binding Loop| DatasetTools["Dataset Tools Hub (count_by_intent, list_examples, summary)"]
     
     DatasetTools ===|5. Local CSV Data Context| CSVRegistry[("Dataset Source (bitext.csv)")]
     
@@ -240,8 +247,8 @@ The decoupled local MCP server parses the spreadsheet records and transmits the 
 Thanks to the universal streaming parser in `app_streamlit.py`, this entire lifecycle is captured and displayed to the user using clean interactive widgets:
 
 * **🛠️ Tool Call (Expander)**: Expands to reveal the arguments payload (`{"category": "ACCOUNT"}`).
-* **📥 Tool Output (Expander)**: Expands to display the raw structural database output snippet in formatted JSON code block blocks.
-* **### Final Answer**: The final structured text breakdown formulated by Llama-3.3 based on the retrieved MCP server packet.
+* **📥 Tool Output (Expander)**: Expands to display the raw structural database output snippet in formatted JSON code blocks.
+* **### Final Answer**: The final structured text breakdown formulated by Llama-3.3 based on the retrieved MCP server response.
 
 ## 10. 🧠 ReAct Execution Trace (Reasoning & Acting)
 
