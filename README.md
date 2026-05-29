@@ -135,7 +135,7 @@ graph TD
     
     RouterNode ===|3. Execution State Payload| ReActGraph["Core ReAct Graph (LangGraph Execution Loop)"]
     
-    ReActGraph ===|4. Dynamic Tool Binding Loop| DatasetTools["Dataset Tools Hub (count_by_intent, list_examples, summary)"]
+    ReActGraph ===|4. Dynamic Tool Binding Loop| DatasetTools["Dataset Tools Hub (count_by_intent, list_examples, summarize_category)"]
     
     DatasetTools ===|5. Local CSV Data Context| CSVRegistry[("Dataset Source (bitext.csv)")]
     
